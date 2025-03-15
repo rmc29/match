@@ -70,9 +70,9 @@ for (row=0;row<=boardheight+1;row++){
 	{
 		if (row<=boardheight) 
 		{
-			document.write ('<td id="td' + row + col + '" onclick=clickcard(' + row + ',' + col + ') height="80" width="120" align="center"><span class="card" id="span' + row + col + '"><img src="blank.gif" id="img' + row + col + '" onclick=clickcard(' + row + ',' + col + ')></span></td>');
+			document.write ('<td id="td' + row + col + '" onclick=clickcard(' + row + ',' + col + ') height="80" width="120" align="center"><div class="card" id="div' + row + col + '"><img src="blank.gif" id="img' + row + col + '" onclick=clickcard(' + row + ',' + col + ')></div></td>');
 		} else {
-			document.write ('<td id="td' + row + col + '" width="120" align="center"><span class="blank" id="span' + row + col + '"></span></td>');
+			document.write ('<td id="td' + row + col + '" width="120" align="center"><div class="blank" id="div' + row + col + '"></div></td>');
 			//adding another row of empty tds here, to fill on dealmorecards
 		}	
 		
@@ -105,6 +105,7 @@ function deal(row, col){
 		if (decksize>=0) 
 		{
 			board[row][col]=deck.pop();
+			decksize--;
 			displaycard(row,col);
 		} else {
 			//deal blanks
@@ -130,14 +131,14 @@ function displaycard (row,col) {
 	//shading depending on 3rd trit concat shape depending on 4th trit; colour depending on 2nd trit; number depending on 1st trit
 	qty = picture[0][ternary(board[row][col])[0]];
 	imagehtml = (qty==0 ? imagehtml : (qty==1 ? imagehtml + another : imagehtml + another + another));
-	imagehtml = '<span class="card" id="span' + row + col + '"><BR>' + imagehtml + '</span>'
+	imagehtml = '<div class="card" id="div' + row + col + '"><BR>' + imagehtml + '</div>'
 	document.getElementById('td' + row + col).innerHTML = imagehtml;
 	document.getElementById('td' + row + col).onclick=function(){clickcard(row,col)};	
 }
 
 function displayblank (row,col)
 {
-	imagehtml = '<span class="blank" id="span' + row + col + '"><img src="blank.gif"></span>';
+	imagehtml = '<div class="blank" id="div' + row + col + '"><img src="blank.gif"></div>';
 	document.getElementById('td' + row + col).innerHTML = imagehtml;
 }
 
@@ -145,7 +146,7 @@ function displayblank (row,col)
 function clickcard(row,col){
 	if (!gameover)
 	{
-		cardclass=document.getElementById('span' + row + col).className;
+		cardclass=document.getElementById('div' + row + col).className;
 		if(cardclass!='selectedcard' && cardclass!='blank')	//if the card isn't already selected or blank...
 		{
 			selectcard(row,col);							//...then select it.
@@ -159,7 +160,7 @@ function clickcard(row,col){
 
 function selectcard(row,col){
 	//give that card a border
-	document.getElementById('span' + row + col).className='selectedcard';
+	document.getElementById('div' + row + col).className='selectedcard';
 	//add it to set
 	set[0][setsize]=board[row][col];
 	set[1][setsize]=row;
@@ -168,7 +169,7 @@ function selectcard(row,col){
 }
 
 function removecardfromset (row,col) {
-	document.getElementById('span' + row + col).className='card';
+	document.getElementById('div' + row + col).className='card';
 	for (i=0;i<=setsize;i++) {
 		if (set[1][i]==row && set[2][i]==col) {		//then i is the index of set where deselecting card is
 			setsize--;								//i can only be 0 or 1. If 1, just reduce setsize.
@@ -185,9 +186,9 @@ function compareset() {
 	} else rejectset();
 	//remove all select borders
 	for (i=0;i<=2;i++){		//remove select border from card at set[1][i], set[2][i]
-		if (document.getElementById('span' + set[1][i] + set[2][i]).className=='selectedcard')
+		if (document.getElementById('div' + set[1][i] + set[2][i]).className=='selectedcard')
 		{
-			document.getElementById('span' + set[1][i] + set[2][i]).className='card';
+			document.getElementById('div' + set[1][i] + set[2][i]).className='card';
 		}
 	}
 	emptytheset();
@@ -230,7 +231,7 @@ function findfinalcard() {
 	swaprowcol=((boardheight + 2) * (boardwidth + 1)) - 1;
 	swaprow=Math.floor(swaprowcol/(boardwidth+1));
 	swapcol=swaprowcol-((boardwidth+1)*swaprow);		//final card in extended board size
-	while (document.getElementById('span' + swaprow + swapcol).className!='card' )
+	while (document.getElementById('div' + swaprow + swapcol).className!='card' )
 	{
 		swaprowcol--;
 		swaprow=Math.floor(swaprowcol/(boardwidth+1));
@@ -261,19 +262,19 @@ function checkforsets()
 	{
 		row[0]=Math.floor(rowcol[0]/(boardwidth+1));
 		col[0]=rowcol[0]-((boardwidth+1)*row[0]);
-		if(document.getElementById('span' + row[0] + col[0]).className!='blank')
+		if(document.getElementById('div' + row[0] + col[0]).className!='blank')
 		{
 			for(rowcol[1]=rowcol[0]+1;rowcol[1]<=((boardwidth+1)*(boardheight+1) - 1);rowcol[1]++)
 			{
 				row[1]=Math.floor(rowcol[1]/(boardwidth+1));
 				col[1]=rowcol[1]-((boardwidth+1)*row[1]);
-				if(document.getElementById('span' + row[1] + col[1]).className!='blank')
+				if(document.getElementById('div' + row[1] + col[1]).className!='blank')
 				{
 					for(rowcol[2]=rowcol[1]+1;rowcol[2]<=((boardwidth+1)*(boardheight+1) - 1);rowcol[2]++)
 					{
 						row[2]=Math.floor(rowcol[2]/(boardwidth+1));
 						col[2]=rowcol[2]-((boardwidth+1)*row[2]);
-						if(document.getElementById('span' + row[2] + col[2]).className!='blank')
+						if(document.getElementById('div' + row[2] + col[2]).className!='blank')
 						{
 							checkset = [board[row[0]][col[0]], board[row[1]][col[1]], board[row[2]][col[2]]];
 							if (compare(checkset))
